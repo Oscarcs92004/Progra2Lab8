@@ -37,6 +37,18 @@ public class ListaSincronizada<T>{
         return elegido;
     }
 
+    public synchronized T extraerCuando(Condicion<T> condicion) throws InterruptedException {
+        while (true) {
+            T elegido = lista.buscar(condicion);
+            if (elegido != null) {
+                lista.eliminar(elegido);
+                notifyAll();
+                return elegido;
+            }
+            wait();
+        }
+    }
+
     public synchronized int extraerHasta(int n, Accion<T> receptor) {
         int extraidos = 0;
         while (extraidos < n && !lista.estaVacia()) {
