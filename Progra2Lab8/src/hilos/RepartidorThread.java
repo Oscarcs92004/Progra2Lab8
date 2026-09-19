@@ -22,7 +22,7 @@ public class RepartidorThread extends Thread {
                 centro.esperarSiPausado();
                 repartidor.setEstado(EstadoRepartidor.DISPONIBLE);
 
-                var listaExpedicion = centro.getListaExpedicion(repartidor.getRutaAsignada());
+                paqueteria.estructuras.ListaSincronizada<modelo.Paquete> listaExpedicion = centro.getListaExpedicion(repartidor.getRutaAsignada());
 
                 Paquete primero = listaExpedicion.extraerSiguiente();
 
@@ -37,8 +37,7 @@ public class RepartidorThread extends Thread {
                 centro.esperarSiPausado();
 
                 repartidor.setEstado(EstadoRepartidor.EN_RUTA);
-                centro.getRegistro().registrar(repartidor.getNombre() + " inicia ruta " + repartidor.getRutaAsignada()
-                        + " con " + carga.tamano() + " paquete(s)");
+                centro.getRegistro().registrar(repartidor.getNombre() + " inicia ruta " + repartidor.getRutaAsignada() + " con " + carga.tamano() + " paquete(s)");
                 Thread.sleep(800 + random.nextInt(700));
 
                 final int[] entregadosEnViaje = {0};
@@ -65,7 +64,6 @@ public class RepartidorThread extends Thread {
         }
     }
 
-    /** Sube un paquete al vehículo: EN_EXPEDICION|NUEVO_INTENTO -> CARGANDO. */
     private void cargarEnVehiculo(Paquete paquete, ListaEnlazada<Paquete> carga) {
         paquete.cambiarEstado(EstadoPaquete.CARGANDO);
         carga.agregar(paquete);
@@ -74,8 +72,7 @@ public class RepartidorThread extends Thread {
         centro.getRegistro().registrar(paquete.getCodigo() + " asignado a " + repartidor.getNombre());
     }
 
-    private void entregarPaquete(Paquete paquete, paqueteria.estructuras.ListaSincronizada<Paquete> listaExpedicion)
-            throws InterruptedException {
+    private void entregarPaquete(Paquete paquete, paqueteria.estructuras.ListaSincronizada<Paquete> listaExpedicion) throws InterruptedException {
         repartidor.setEstado(EstadoRepartidor.ENTREGANDO);
         paquete.cambiarEstado(EstadoPaquete.EN_REPARTO);
         Thread.sleep(600 + random.nextInt(900));

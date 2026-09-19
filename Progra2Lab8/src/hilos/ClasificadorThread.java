@@ -20,10 +20,11 @@ public class ClasificadorThread extends Thread{
         try {
             while (centro.isCorriendo()) {
                 centro.esperarSiPausado();
-
-                Paquete paquete = centro.getListaAlmacen().extraerSiguiente();
-
+                Paquete paquete = centro.getListaAlmacen().extraerCuando(
+                        p -> System.currentTimeMillis() - p.getHoraEntradaAlmacen() >= 2000
+                );
                 centro.getContadorEnClasificacion().incrementar();
+                centro.setPaqueteClasificando(num - 1, paquete);
                 paquete.cambiarEstado(EstadoPaquete.CLASIFICANDO);
                 centro.getRegistro().registrar(paquete.getCodigo() + " tomado por " + getName());
 
@@ -34,6 +35,7 @@ public class ClasificadorThread extends Thread{
                 paquete.setRuta(ruta);
                 paquete.cambiarEstado(EstadoPaquete.CLASIFICADO);
                 centro.getContadorEnClasificacion().decrementar();
+                centro.setPaqueteClasificando(num - 1, null);
                 centro.getRegistro().registrar(paquete.getCodigo() + " clasificado -> " + ruta);
 
                 centro.getListaEmpaquetado().agregar(paquete);

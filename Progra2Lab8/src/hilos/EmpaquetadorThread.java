@@ -19,6 +19,7 @@ public class EmpaquetadorThread extends Thread{
                 Paquete paquete = centro.getListaEmpaquetado().extraerSiguiente();
 
                 centro.getContadorEnEmpaquetado().incrementar();
+                centro.setPaqueteEmpaquetando(Integer.parseInt(getName().substring(getName().lastIndexOf("-") + 1)) - 1, paquete);
                 paquete.cambiarEstado(EstadoPaquete.EMPAQUETANDO);
                 centro.getRegistro().registrar(paquete.getCodigo() + " en empaquetado por " + getName());
 
@@ -27,6 +28,7 @@ public class EmpaquetadorThread extends Thread{
 
                 paquete.cambiarEstado(EstadoPaquete.EMPAQUETADO);
                 centro.getContadorEnEmpaquetado().decrementar();
+                centro.setPaqueteEmpaquetando(Integer.parseInt(getName().substring(getName().lastIndexOf("-") + 1)) - 1, null);
                 centro.getRegistro().registrar(paquete.getCodigo() + " empaquetado");
 
                 paquete.cambiarEstado(EstadoPaquete.EN_EXPEDICION);

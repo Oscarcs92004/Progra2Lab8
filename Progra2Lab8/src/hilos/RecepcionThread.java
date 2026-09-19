@@ -28,28 +28,46 @@ public class RecepcionThread extends Thread {
             String[] ciudades = centro.getCiudades();
             while (centro.isCorriendo()) {
                 centro.esperarSiPausado();
+                int cantidadPorLote = 3;
+                Paquete[] lote = new Paquete[cantidadPorLote];
 
-                Paquete paquete = new Paquete(
-                        CLIENTES[random.nextInt(CLIENTES.length)],
-                        DIRECCIONES[random.nextInt(DIRECCIONES.length)],
-                        ciudades[random.nextInt(ciudades.length)],
-                        redondear(0.5 + random.nextDouble() * 9.5),
-                        Prioridad.aleatoria(random)
-                );
+                for (int i = 0; i < cantidadPorLote && centro.isCorriendo(); i++) {
+                    lote[i] = new Paquete(
+                            CLIENTES[random.nextInt(CLIENTES.length)],
+                            DIRECCIONES[random.nextInt(DIRECCIONES.length)],
+                            ciudades[random.nextInt(ciudades.length)],
+                            redondear(0.5 + random.nextDouble() * 9.5),
+                            Prioridad.aleatoria(random)
+                    );
 
-                centro.getListaRecepcion().agregar(paquete);
-                centro.getEstadisticas().registrarGenerado();
-                centro.getRegistro().registrar(paquete.getCodigo() + " recibido (" + paquete.getPrioridad().getEtiqueta() + ")");
+                    centro.getListaRecepcion().agregar(lote[i]);
+                    centro.getEstadisticas().registrarGenerado();
+                    centro.getRegistro().registrar(
+                            lote[i].getCodigo() + " recibido (" +
+                                    lote[i].getPrioridad().getEtiqueta() + ")"
+                    );
 
-                Thread.sleep(300 + random.nextInt(400));
+                    Thread.sleep(250);
+                    centro.esperarSiPausado();
+                }
+
+                Thread.sleep(2000);
                 centro.esperarSiPausado();
 
-                centro.getListaRecepcion().extraerSiguiente();
-                paquete.cambiarEstado(EstadoPaquete.ALMACENADO);
-                centro.getListaAlmacen().agregar(paquete);
-                centro.getRegistro().registrar(paquete.getCodigo() + " almacenado");
+                for (Paquete paquete : lote) {
+                    if (paquete == null || !centro.isCorriendo()) {
+                        continue;
+                    }
 
-                Thread.sleep(1500 + random.nextInt(1500));
+                    centro.getListaRecepcion().extraerSiguiente();
+                    paquete.cambiarEstado(EstadoPaquete.ALMACENADO);
+                    centro.getListaAlmacen().agregar(paquete);
+                    centro.getRegistro().registrar(
+                            paquete.getCodigo() + " almacenado"
+                    );
+                }
+
+                Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
         }
