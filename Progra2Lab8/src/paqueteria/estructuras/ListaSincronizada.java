@@ -14,6 +14,66 @@ public class ListaSincronizada<T>{
         this.comparadorPrioridad = comparadorPrioridad;
     }
 
-    
+    public synchronized void agregar(T dato) throws InterruptedException {
+        while (lista.tamano() >= capMax) {
+            wait();
+        }
+        lista.agregar(dato);
+        notifyAll(); 
+    }
 
+    public synchronized T extraerSiguiente() throws InterruptedException {
+        while (lista.estaVacia()) {
+            wait();
+        }
+        T elegido;
+        if (comparadorPrioridad != null) {
+            elegido = lista.obtenerMaximo(comparadorPrioridad);
+        } else {
+            elegido = lista.obtener(0);
+        }
+        lista.eliminar(elegido);
+        notifyAll();
+        return elegido;
+    }
+
+    public synchronized int extraerHasta(int n, Accion<T> receptor) {
+        int extraidos = 0;
+        while (extraidos < n && !lista.estaVacia()) {
+            T elegido;
+            if (comparadorPrioridad != null) {
+                elegido = lista.obtenerMaximo(comparadorPrioridad);
+            } else {
+                elegido = lista.obtener(0);
+            }
+            lista.eliminar(elegido);
+            receptor.ejecutar(elegido);
+            extraidos++;
+        }
+        if (extraidos > 0) {
+            notifyAll();
+        }
+        return extraidos;
+    }
+
+    public synchronized int tamano() {
+        return lista.tamano();
+    }
+
+    public synchronized boolean estaVacia() {
+        return lista.estaVacia();
+    }
+
+    public int capacidad() {
+        return capMax;
+    }
+
+    public synchronized void recorrer(Accion<T> accion) {
+        lista.recorrer(accion);
+    }
+
+    public synchronized void despertarTodos() {
+        notifyAll();
+    }
+    
 }
