@@ -17,6 +17,7 @@ public class Paquete {
 
     private final long horaCreacion;
     private volatile long horaEntrega;
+    private volatile long horaEntradaAlmacen;
 
     public Paquete(String cliente, String direccion, String ciudad, double peso, Prioridad prioridad) {
         this.codigo = String.format("PKG-%05d", CONTADOR.incrementarYObtener());
@@ -61,6 +62,9 @@ public class Paquete {
     public String getRuta() { return ruta; }
     public void setRuta(String ruta) { this.ruta = ruta; }
     public int getIntentos() { return intentos; }
+    public void marcarEntradaAlmacen() { this.horaEntradaAlmacen = System.currentTimeMillis(); }
+    public long getHoraEntradaAlmacen() { return horaEntradaAlmacen; }
+
 
     @Override
     public String toString() {

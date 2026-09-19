@@ -33,7 +33,7 @@ public enum EstadoPaquete {
             case CARGANDO:
                 return destino == EN_REPARTO;
             case EN_REPARTO:
-                return destino == ENTREGADO || destino == NUEVO_INTENTO;
+                return destino == ENTREGADO || destino == NUEVO_INTENTO || destino == DEVUELTO;
             case NUEVO_INTENTO:
                 return destino == CARGANDO || destino == DEVUELTO;
             case ENTREGADO:
