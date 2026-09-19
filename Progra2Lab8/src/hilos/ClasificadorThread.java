@@ -16,6 +16,29 @@ public class ClasificadorThread extends Thread{
 
     @Override
     public void run() {
-       // vacio por mientras
+        Random random = new Random();
+        try {
+            while (centro.isCorriendo()) {
+                centro.esperarSiPausado();
+
+                Paquete paquete = centro.getListaAlmacen().extraerSiguiente();
+
+                centro.getContadorEnClasificacion().incrementar();
+                paquete.cambiarEstado(EstadoPaquete.CLASIFICANDO);
+                centro.getRegistro().registrar(paquete.getCodigo() + " tomado por " + getName());
+
+                Thread.sleep(500 + random.nextInt(600));
+                centro.esperarSiPausado();
+
+                String ruta = centro.rutaParaCiudad(paquete.getCiudad());
+                paquete.setRuta(ruta);
+                paquete.cambiarEstado(EstadoPaquete.CLASIFICADO);
+                centro.getContadorEnClasificacion().decrementar();
+                centro.getRegistro().registrar(paquete.getCodigo() + " clasificado -> " + ruta);
+
+                centro.getListaEmpaquetado().agregar(paquete);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 }
